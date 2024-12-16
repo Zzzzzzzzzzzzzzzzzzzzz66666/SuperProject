@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>提交预约信息</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            max-width: 1000px;
+            margin: 40px auto;
+            background-color: #fff;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            padding: 30px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        label {
+            display: block;
+            color: #555;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        input[type="text"], input[type="tel"], select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+            transition: border-color 0.3s ease;
+        }
+
+        input[type="text"]:focus, input[type="tel"]:focus, select:focus {
+            border-color: #4CAF50;
+            outline: none;
+        }
+
+        .submit-btn {
+            width: 100%;
+            padding: 14px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        .submit-btn:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>提交预约信息</h1>
+    <form id="appointment-form" method="post" action="{% url 'online-register' %}">
+        {% csrf_token %}
+
+        <!-- 姓名 -->
+        <div class="form-group">
+            <label for="name">姓名</label>
+            <input type="text" id="name" name="name" placeholder="请输入您的姓名" required>
+        </div>
+
+        <!-- 性别 -->
+        <div class="form-group">
+    <label>性别</label>
+    <div style="display: flex; align-items: center; gap: 20px;">
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="radio" id="male" name="gender" value="M" required>
+            <label for="male">男</label>
+        </div>
+        <div style="display: flex; align-items: center; gap: 5px;">
+            <input type="radio" id="female" name="gender" value="F" required>
+            <label for="female">女</label>
+        </div>
+    </div>
+</div>
+
+
+        <!-- 年龄 -->
+        <div class="form-group">
+            <label for="age">年龄</label>
+            <select id="age" name="age" required>
+                <option value="">选择年龄</option>
+                <script>
+                    for (let i = 1; i <= 100; i++) {
+                        document.write(`<option value="${i}">${i}岁</option>`);
+                    }
+                </script>
+            </select>
+        </div>
+
+        <!-- 电话号码 -->
+        <div class="form-group">
+            <label for="phone">电话号码</label>
+            <input type="tel" id="phone" name="phone_number" placeholder="请输入您的电话号码" required>
+        </div>
+
+        <!-- 身份证号 -->
+        <div class="form-group">
+            <label for="id-card">身份证号</label>
+            <input type="text" id="id-card" name="id_card" placeholder="请输入您的身份证号" required>
+        </div>
+
+        <!-- 科室 -->
+        <div class="form-group">
+            <label for="department">科室</label>
+            <select id="department" name="department" required onchange="loadDoctors()">
+                <option value="">选择科室</option>
+                {% for dept in departments %}
+                    <option value="{{ dept.id }}">{{ dept.name }}</option>
+                {% endfor %}
+            </select>
+        </div>
+
+        <!-- 医生 -->
+        <div class="form-group">
+            <label for="doctor">医生</label>
+            <select id="doctor" name="doctor" required>
+                <option value="">选择医生</option>
+            </select>
+        </div>
+
+        <!-- 提交按钮 -->
+        <button type="submit" class="submit-btn">提交预约</button>
+    </form>
+</div>
+
+<script>
+    function loadDoctors() {
+        const departmentId = document.getElementById("department").value;
+        const doctorSelect = document.getElementById("doctor");
+
+        // 清空医生选项
+        doctorSelect.innerHTML = '<option value="">选择医生</option>';
+
+        if (departmentId) {
+            fetch(`/online-register/?department_id=${departmentId}`)
+                .then(response => response.json())
+                .then(data => {
+                    if (data.doctors) {
+                        data.doctors.forEach(doctor => {
+                            const option = document.createElement("option");
+                            option.value = doctor.id;
+                            option.textContent = doctor.name;
+                            doctorSelect.appendChild(option);
+                        });
+                    } else {
+                        alert("该科室无医生可选，请重新选择。");
+                    }
+                })
+                .catch(error => {
+                    console.error("Error loading doctors:", error);
+                    alert("加载医生失败，请稍后重试。");
+                });
+        }
+    }
+</script>
+
+</body>
+</html>

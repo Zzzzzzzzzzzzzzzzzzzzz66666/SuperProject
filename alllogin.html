@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成信大医疗信息管理系统</title>
+    {% load static %}
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background: #f5f5f5;
+        }
+        .container {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            text-align: center;
+        }
+        .button-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+            margin-bottom: 20px;
+        }
+        .button-box {
+            width: 200px;
+            height: 200px;
+            background: rgba(0, 123, 255, 0.1);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+            text-decoration: none;
+            color: inherit;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+        }
+        .button-box:hover {
+            transform: scale(1.05);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+        }
+        .button-box img {
+            width: 60px;
+            height: 60px;
+            margin-bottom: 15px;
+        }
+        .button-box .title-cn {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        .button-box .title-en {
+            font-size: 14px;
+            font-weight: 300;
+        }
+        .login-form {
+            display: none;
+            flex-direction: column;
+            width: 100%;
+            max-width: 300px;
+            margin-top: 20px;
+        }
+        .login-form.active {
+            display: flex;
+        }
+        .login-form input {
+            padding: 10px;
+            margin-bottom: 15px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        .login-form button {
+            padding: 10px;
+            background: #4caf50;
+            border: none;
+            color: white;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .login-form button:hover {
+            background: #45a049;
+        }
+    </style>
+    <script>
+        function toggleLogin(type) {
+            const forms = document.querySelectorAll('.login-form');
+            forms.forEach(form => form.classList.remove('active'));
+            if (type === 'staff') {
+                document.getElementById(type + '-form').classList.add('active');
+            }
+        }
+
+        function doctorLogin(event) {
+            event.preventDefault();
+            const username = document.getElementById('doctor-username').value;
+            const password = document.getElementById('doctor-password').value;
+
+            fetch('/doctor-loginfirst/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({ username, password }),
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('登录成功！欢迎 ' + data.doctor.name);
+                    window.location.href = '/doctor-page/';
+                } else {
+                    alert('登录失败：' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+            });
+        }
+    </script>
+</head>
+<body>
+    <div class="container">
+        <h1>欢迎使用 成信大医疗信息管理系统</h1>
+        <div class="button-container">
+            <!-- 公众版跳转 -->
+            <a href="{% url 'login' %}" class="button-box">
+                <img src="{% static 'HIS/image/公众.png' %}" alt="Public">
+                <div class="title-cn">公众版</div>
+                <div class="title-en">FOR THE PUBLIC</div>
+            </a>
+            <!-- 医生版显示登录框 -->
+            <div class="button-box" onclick="toggleLogin('staff')">
+                <img src="{% static 'HIS/image/医生.png' %}" alt="Doctor">
+                <div class="title-cn">医生版</div>
+                <div class="title-en">FOR DOCTOR</div>
+            </div>
+        </div>
+        <!-- 医生版登录表单 -->
+        <form id="staff-form" class="login-form" onsubmit="doctorLogin(event)">
+            <input type="text" id="doctor-username" placeholder="请输入姓名" required>
+            <input type="password" id="doctor-password" placeholder="请输入身份证号" required>
+            <button type="submit">登录</button>
+        </form>
+    </div>
+</body>
+</html>

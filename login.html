@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登录 - 成信大医疗信息管理系统</title>
+    {% load static %}
+    <style>
+        body {
+            background-image: url("{% static 'HIS/image/login.jpg' %}");
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f6f9;
+        }
+        .login-container {
+            background-color: #ffffff;
+            padding: 40px;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            text-align: center;
+            width: 300px;
+        }
+        .login-container h1 {
+            color: #333;
+            margin-bottom: 20px;
+        }
+        .login-container input {
+            width: 100%;
+            padding: 12px;
+            margin: 8px 0;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            box-sizing: border-box;
+        }
+        .login-container input[type="submit"] {
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+        .login-container input[type="submit"]:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+<div class="login-container">
+    <h1>欢迎使用 成信大医疗信息管理系统</h1>
+    <form onsubmit="handleLogin(event)">
+        <input type="text" id="username" placeholder="账号" name="username" required>
+        <input type="password" id="password" placeholder="密码" name="password" required>
+        <input type="submit" value="登录">
+    </form>
+    <a href="{% url 'register' %}">注册</a>
+</div>
+
+<script>
+function handleLogin(event) {
+    event.preventDefault(); // 阻止表单默认提交
+    const username = document.getElementById('username').value;
+    const password = document.getElementById('password').value;
+
+    fetch('/login/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/x-www-form-urlencoded',
+            'X-CSRFToken': '{{ csrf_token }}',
+        },
+        body: `username=${username}&password=${password}`,
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.status === 'success') {
+            window.location.href = '/main-page/';
+        } else {
+            alert(data.message);
+        }
+    });
+}
+</script>
+</body>
+</html>

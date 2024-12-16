@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>填写健康档案</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f0f2f5;
+            color: #333;
+            margin: 0;
+            padding: 0;
+        }
+        .container {
+            width: 60%;
+            margin: 50px auto;
+            padding: 30px;
+            background-color: #fff;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            border-radius: 15px;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 36px;
+            margin-bottom: 30px;
+        }
+        label {
+            font-size: 18px;
+            margin-bottom: 8px;
+        }
+        input[type="text"],
+        input[type="number"],
+        select {
+            width: 100%;
+            padding: 12px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+        button {
+            width: 100%;
+            padding: 15px;
+            font-size: 18px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 25px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>填写健康档案</h1>
+        <form id="healthForm">
+            <label for="name">姓名</label>
+            <input type="text" id="name" name="name" placeholder="请输入您的姓名" required>
+
+            <label for="gender">性别</label>
+            <select id="gender" name="gender" required>
+                <option value="male">男</option>
+                <option value="female">女</option>
+            </select>
+
+            <label for="age">年龄</label>
+            <input type="number" id="age" name="age" placeholder="请输入年龄" min="0" max="100" required>
+
+            <label for="height">身高（单位：米）</label>
+            <input type="text" id="height" name="height" placeholder="请输入身高（例如：1.75）" required>
+
+            <label for="weight">体重（单位：千克）</label>
+            <input type="text" id="weight" name="weight" placeholder="请输入体重（例如：70）" required>
+
+            <label for="phone">电话号</label>
+            <input type="text" id="phone" name="phone" placeholder="请输入电话号码" required>
+
+
+            <button type="submit">提交档案</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById('healthForm').addEventListener('submit', function(event) {
+            event.preventDefault();
+
+            // 获取表单数据
+            const healthData = {
+                name: document.getElementById('name').value,
+                gender: document.getElementById('gender').value === "male" ? "男" : "女",
+                age: document.getElementById('age').value,
+                height: document.getElementById('height').value,
+                weight: document.getElementById('weight').value,
+                phone: document.getElementById('phone').value,
+            };
+
+            // 发送数据到后端
+            fetch('/build-personalfile/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify([healthData]),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert('档案已成功提交并保存到数据库！');
+                    window.location.href = '/personalfile/';
+                } else {
+                    alert('提交失败：' + result.message);
+                }
+            })
+            .catch(error => {
+                console.error('提交错误：', error);
+                alert('提交过程中发生错误，请稍后再试！');
+            });
+        });
+    </script>
+
+</body>
+</html>

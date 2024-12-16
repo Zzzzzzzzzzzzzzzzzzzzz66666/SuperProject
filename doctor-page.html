@@ -1,0 +1,351 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>医生管理页面</title>
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background: linear-gradient(to right, #42a5f5, #64b5f6);
+            color: #333;
+        }
+        .container {
+            max-width: 1200px;
+            margin: 30px auto;
+            background: #ffffff;
+            border-radius: 15px;
+            box-shadow: 0 6px 10px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+        }
+        .header {
+            background: #1976d2;
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .header h1 {
+            margin: 0;
+        }
+        .nav {
+            display: flex;
+            background: #2196f3;
+        }
+        .nav button {
+            flex: 1;
+            padding: 15px;
+            border: none;
+            background: #2196f3;
+            color: white;
+            font-size: 16px;
+            cursor: pointer;
+            transition: background 0.3s;
+        }
+        .nav button:hover {
+            background: #1769aa;
+        }
+        .nav button.active {
+            background: #1565c0;
+        }
+        .content {
+            padding: 20px;
+        }
+        .section {
+            display: none;
+        }
+        .section.active {
+            display: block;
+        }
+        .info-box {
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+            font-size: 16px;
+        }
+        .info-box div {
+            padding: 10px;
+            background: #f9f9f9;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        table th, table td {
+            padding: 10px 15px;
+            border: 1px solid #ddd;
+            text-align: left;
+        }
+        table th {
+            background: #1976d2;
+            color: white;
+        }
+        table tr:nth-child(even) {
+            background: #f9f9f9;
+        }
+        .btn {
+            padding: 5px 10px;
+            background: #1976d2;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+        .btn:hover {
+            background: #1565c0;
+        }
+        .form-group {
+            margin-top: 10px;
+        }
+        .form-group label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+        .form-group input,
+        .form-group select {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 5px;
+            font-size: 14px;
+        }
+    </style>
+    <script>
+        function loadDoctorData() {
+    const doctorInfoBox = document.querySelector('.info-box');
+    const appointmentsTable = document.getElementById('appointments-body');
+
+    fetch('/doctor-page/', {
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest',
+        },
+    })
+        .then((response) => response.json())
+        .then((data) => {
+            if (data.error) {
+                alert('加载失败: ' + data.error);
+                return;
+            }
+
+            // 渲染医生信息
+            const doctor = data.doctor || {};
+            doctorInfoBox.innerHTML = `
+                <div><strong>姓名：</strong>${doctor.name || '未知'}</div>
+                <div><strong>身份证号：</strong>${doctor.id_card || '未知'}</div>
+                <div><strong>科室：</strong>${doctor.department || '未知'}</div>
+                <div><strong>状态：</strong>${doctor.status || '未知'}</div>
+                <button class="btn" onclick="toggleEditForm()">修改个人信息</button>
+            `;
+
+            // 渲染预约信息
+            const appointments = Array.isArray(data.appointments) ? data.appointments : [];
+            appointmentsTable.innerHTML = '';
+            if (appointments.length === 0) {
+                appointmentsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: grey;">暂无预约信息</td>
+                    </tr>`;
+            } else {
+                appointments.forEach((order) => {
+                    const row = `
+                        <tr id="appointment-${order.id}">
+                            <td>${order.name}</td>
+                            <td>${order.gender}</td>
+                            <td>${order.age}</td>
+                            <td>${order.phone_number}</td>
+                            <td>${order.id_card}</td>
+                            <td>${order.department}</td>
+                            <td><button class="btn" onclick="markAsCompleted(${order.id})">已完成</button></td>
+                        </tr>`;
+                    appointmentsTable.innerHTML += row;
+                });
+            }
+        })
+        .catch((error) => {
+            console.error('加载失败:', error);
+            appointmentsTable.innerHTML = `
+                <tr>
+                    <td colspan="7" style="text-align: center; color: red;">预约信息加载失败，请稍后再试。</td>
+                </tr>`;
+        });
+}
+
+        function markAsCompleted(appointmentId) {
+    fetch('/doctor-page/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken'),
+        },
+        body: JSON.stringify({ action: 'delete_appointment', appointment_id: appointmentId }),
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.success) {
+            alert('预约已标记为完成');
+            // 从表格中移除该行
+            document.getElementById(`appointment-${appointmentId}`).remove();
+
+            // 如果表格空了，显示暂无预约信息
+            const appointmentsTable = document.getElementById('appointments-body');
+            if (!appointmentsTable.children.length) {
+                appointmentsTable.innerHTML = `
+                    <tr>
+                        <td colspan="7" style="text-align: center; color: grey;">暂无预约信息</td>
+                    </tr>`;
+            }
+        } else {
+            alert('操作失败: ' + data.message);
+        }
+    })
+    .catch(error => {
+        console.error('删除失败:', error);
+        alert('服务器错误，请稍后再试');
+    });
+}
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === name + '=') {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+        function toggleEditForm() {
+            const editForm = document.getElementById('edit-info-form');
+            editForm.style.display = editForm.style.display === 'none' ? 'block' : 'none';
+        }
+
+        function updateDoctorInfo() {
+            const idCard = document.getElementById('edit-id-card').value;
+            const department = document.getElementById('edit-department').value;
+            const status = document.getElementById('edit-status').value;
+
+            fetch('/doctor-page/', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': getCookie('csrftoken')
+                },
+                body: JSON.stringify({
+                    id_card: idCard,
+                    department: department,
+                    status: status
+                })
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    alert('信息已成功更新');
+                    loadDoctorData();
+                } else {
+                    alert('更新失败: ' + data.message);
+                }
+            })
+            .catch(error => {
+                console.error('更新失败:', error);
+                alert('服务器错误，请稍后再试');
+            });
+        }
+
+        function getCookie(name) {
+            let cookieValue = null;
+            if (document.cookie && document.cookie !== '') {
+                const cookies = document.cookie.split(';');
+                for (let i = 0; i < cookies.length; i++) {
+                    const cookie = cookies[i].trim();
+                    if (cookie.substring(0, name.length + 1) === name + '=') {
+                        cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                        break;
+                    }
+                }
+            }
+            return cookieValue;
+        }
+
+        function showSection(sectionId) {
+            const sections = document.querySelectorAll('.section');
+            const buttons = document.querySelectorAll('.nav button');
+            sections.forEach(section => section.classList.remove('active'));
+            buttons.forEach(button => button.classList.remove('active'));
+            document.getElementById(sectionId).classList.add('active');
+            document.querySelector(`[data-section="${sectionId}"]`).classList.add('active');
+        }
+
+        window.onload = function () {
+            loadDoctorData();
+        };
+    </script>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>医生管理页面</h1>
+        </div>
+        <div class="nav">
+            <button data-section="personal-info" class="active" onclick="showSection('personal-info')">个人信息</button>
+            <button data-section="patient-appointments" onclick="showSection('patient-appointments')">查看病人预约</button>
+        </div>
+        <div class="content">
+            <!-- 个人信息 -->
+            <div id="personal-info" class="section active">
+                <h2>个人信息</h2>
+                <div class="info-box"></div>
+                <!-- 修改个人信息表单 -->
+                <div id="edit-info-form" style="display: none;">
+                    <h3>修改个人信息</h3>
+                    <form id="update-doctor-form">
+                        <div class="form-group">
+                            <label for="edit-id-card">身份证号</label>
+                            <input type="text" id="edit-id-card">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-department">科室</label>
+                            <input type="text" id="edit-department">
+                        </div>
+                        <div class="form-group">
+                            <label for="edit-status">状态</label>
+                            <select id="edit-status">
+                                <option value="在职">在职</option>
+                                <option value="离职">离职</option>
+                            </select>
+                        </div>
+                        <button type="button" class="btn" onclick="updateDoctorInfo()">保存修改</button>
+                    </form>
+                </div>
+            </div>
+            <!-- 病人预约 -->
+            <div id="patient-appointments" class="section">
+                <h2>病人预约</h2>
+                <table>
+                    <thead>
+                        <tr>
+                            <th>姓名</th>
+                            <th>性别</th>
+                            <th>年龄</th>
+                            <th>电话号码</th>
+                            <th>身份证号</th>
+                            <th>科室</th>
+                            <th>操作</th>
+                        </tr>
+                    </thead>
+                    <tbody id="appointments-body"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</body>
+</html>

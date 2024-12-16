@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>成信大智慧健康诊疗医院</title>
+    {% load static %}
+    <style>
+        :root {
+            --primary-color: #004D40;
+            --secondary-color: #00796B;
+            --accent-color: #FF5252;
+            --background-color: #f9f9f9;
+            --text-color: #333;
+            --white-color: #FFFFFF;
+        }
+
+        body {
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
+            font-family: "微软雅黑", Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--background-color);
+            color: var(--text-color);
+        }
+
+        header {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        header .logo {
+            display: flex;
+            align-items: center;
+        }
+
+        header .logo img {
+            height: 60px;
+            margin-right: 15px;
+            border-radius: 5px;
+        }
+
+        header h1 {
+            font-size: 1.8em;
+        }
+
+        header .links a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 1em;
+            padding: 5px 10px;
+            border: 1px solid var(--white-color);
+            border-radius: 5px;
+            transition: background 0.3s;
+        }
+
+        header .links a:hover {
+            background-color: var(--secondary-color);
+        }
+
+        nav {
+            background-color: var(--secondary-color);
+            display: flex;
+            justify-content: space-around;
+            padding: 10px 0;
+        }
+
+        nav a {
+            color: var(--white-color);
+            text-decoration: none;
+            font-size: 1em;
+            padding: 8px 15px;
+            border-radius: 5px;
+            transition: background-color 0.3s;
+        }
+
+        nav a:hover {
+            background-color: var(--primary-color);
+        }
+
+        .banner {
+            background: linear-gradient(45deg, var(--accent-color), #FF8A80);
+            color: var(--white-color);
+            text-align: center;
+            padding: 60px 20px;
+            border-bottom: 5px solid #E64A19;
+        }
+
+        .banner h1 {
+            font-size: 2.5em;
+            margin: 0;
+        }
+
+        .banner p {
+            font-size: 1.2em;
+            margin-top: 10px;
+        }
+
+        .features {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+            gap: 20px;
+            padding: 20px;
+            background-color: var(--white-color);
+        }
+
+        .feature {
+            text-align: center;
+            background-color: #FAFAFA;
+            padding: 20px;
+            border: 1px solid #ddd;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+            width: 200px;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+
+        .feature:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .feature img {
+            height: 60px;
+            margin-bottom: 15px;
+        }
+
+        footer {
+            background-color: var(--primary-color);
+            color: var(--white-color);
+            text-align: center;
+            padding: 20px;
+            margin-top: auto;
+        }
+
+        footer p {
+            margin: 5px 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div class="logo">
+            <img src="{% static 'HIS/image/3.png' %}" alt="医院标志">
+            <h1>成信大智慧健康诊疗医院</h1>
+        </div>
+        <div class="links">
+            <a href="{% url 'alllogin' %}">登录</a>
+        </div>
+    </header>
+    <nav>
+        <a href="#services" class="need-login">服务项目</a>
+        <a href="#team" class="need-login">团队介绍</a>
+        <a href="#news" class="need-login">新闻动态</a>
+    </nav>
+    <section class="banner">
+        <h1>欢迎来到我们的医院</h1>
+        <p>提供最优质的医疗服务与关怀</p>
+    </section>
+    <section class="features">
+        <div class="feature">
+            <img src="{% static 'HIS/image/4.png' %}" alt="医院简介">
+            <h2>医院简介</h2>
+            <p>点击了解医院信息</p>
+        </div>
+        <div class="feature">
+            <img src="{% static 'HIS/image/2.png' %}" alt="在线预约">
+            <h2>在线预约</h2>
+            <p>点击进行在线预约</p>
+        </div>
+        <div class="feature">
+            <img src="{% static 'HIS/image/1.png' %}" alt="医生介绍">
+            <h2>医生介绍</h2>
+            <p>点击了解医生信息</p>
+        </div>
+    </section>
+    <footer>
+        <p>© 2024 成信大智慧健康诊疗医院. 保留所有权利.</p>
+    </footer>
+
+    <script>
+        const needLoginLinks = document.querySelectorAll('.need-login');
+
+        needLoginLinks.forEach(link => {
+            link.addEventListener('click', function(event) {
+                alert("请先登录");
+                event.preventDefault();
+            });
+        });
+
+        const features = document.querySelectorAll('.feature');
+
+        features.forEach(feature => {
+            feature.addEventListener('click', function() {
+                alert("请先登录");
+            });
+        });
+    </script>
+</body>
+</html>

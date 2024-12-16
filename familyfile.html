@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>家庭档案管理</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+        }
+
+        .container {
+            width: 80%;
+            margin: 30px auto;
+            background-color: #fff;
+            padding: 20px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            border-radius: 8px;
+        }
+
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            margin-bottom: 30px;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        th {
+            background-color: #4CAF50;
+            color: white;
+        }
+
+        td {
+            background-color: #f9f9f9;
+        }
+
+        .operation-btn {
+            background-color: #4CAF50;
+            color: white;
+            padding: 6px 12px;
+            border: none;
+            cursor: pointer;
+            border-radius: 4px;
+            transition: background-color 0.3s;
+        }
+
+        .operation-btn:hover {
+            background-color: #45a049;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.5);
+            justify-content: center;
+            align-items: center;
+        }
+
+        .modal-content {
+            background-color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 400px;
+        }
+
+        .modal-content input, .modal-content select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            border: none;
+            background-color: #4CAF50;
+            color: white;
+            border-radius: 4px;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .modal-content button:hover {
+            background-color: #45a049;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                width: 95%;
+            }
+
+            th, td {
+                font-size: 12px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>家庭档案管理</h1>
+        <button class="operation-btn" onclick="openAddModal()">添加档案</button>
+        <table id="records-table">
+            <thead>
+                <tr>
+                    <th>编号</th>
+                    <th>姓名</th>
+                    <th>关系</th>
+                    <th>性别</th>
+                    <th>年龄</th>
+                    <th>身高</th>
+                    <th>体重</th>
+                    <th>操作</th>
+                </tr>
+            </thead>
+            <tbody></tbody>
+        </table>
+    </div>
+
+    <div class="modal" id="add-modal">
+        <div class="modal-content">
+            <h3 id="modal-title">添加家庭档案</h3>
+            <input type="hidden" id="edit-number" />
+            <label for="add-name">姓名：</label>
+            <input type="text" id="add-name" placeholder="请输入姓名" required>
+
+            <label for="add-relation">关系：</label>
+            <select id="add-relation">
+                <option value="Father">父亲</option>
+                <option value="Mother">母亲</option>
+                <option value="Son">儿子</option>
+                <option value="Daughter">女儿</option>
+            </select>
+
+            <label for="add-gender">性别：</label>
+            <select id="add-gender">
+                <option value="M">男</option>
+                <option value="F">女</option>
+            </select>
+
+            <label for="add-age">年龄：</label>
+            <input type="number" id="add-age" placeholder="请输入年龄" required>
+
+            <label for="add-height">身高（cm）：</label>
+            <input type="number" id="add-height" placeholder="请输入身高" required>
+
+            <label for="add-weight">体重（kg）：</label>
+            <input type="number" id="add-weight" placeholder="请输入体重" required>
+
+            <button id="modal-submit-btn" onclick="submitForm()">提交</button>
+            <button onclick="closeAddModal()">关闭</button>
+        </div>
+    </div>
+
+    <script>
+        let records = [];
+
+        function loadRecords() {
+            fetch('/familyfile/', { method: 'GET', headers: { 'Accept': 'application/json' } })
+            .then(response => response.json())
+            .then(data => {
+                records = data;
+                renderTable();
+            })
+            .catch(error => {
+                console.error('加载数据错误：', error);
+                alert('无法加载数据，请稍后再试！');
+            });
+        }
+
+        function renderTable() {
+            const tableBody = document.querySelector('#records-table tbody');
+            tableBody.innerHTML = '';
+            records.forEach((record, index) => {
+                const row = document.createElement('tr');
+                row.innerHTML = `
+                    <td>${record.number}</td>
+                    <td>${record.name}</td>
+                    <td>${record.relation}</td>
+                    <td>${record.gender === 'M' ? '男' : '女'}</td>
+                    <td>${record.age}</td>
+                    <td>${record.height}</td>
+                    <td>${record.weight}</td>
+                    <td>
+                        <button class="operation-btn" onclick="openEditModal(${index})">修改</button>
+                        <button class="operation-btn" onclick="deleteRecord(${index})">删除</button>
+                    </td>
+                `;
+                tableBody.appendChild(row);
+            });
+        }
+
+        function openAddModal() {
+            document.getElementById('modal-title').innerText = '添加家庭档案';
+            document.getElementById('edit-number').value = '';
+            document.getElementById('add-name').value = '';
+            document.getElementById('add-relation').value = 'Father';
+            document.getElementById('add-gender').value = 'M';
+            document.getElementById('add-age').value = '';
+            document.getElementById('add-height').value = '';
+            document.getElementById('add-weight').value = '';
+            document.getElementById('add-modal').style.display = 'flex';
+        }
+
+        function openEditModal(index) {
+            const record = records[index];
+            document.getElementById('modal-title').innerText = '修改家庭档案';
+            document.getElementById('edit-number').value = record.number;
+            document.getElementById('add-name').value = record.name;
+            document.getElementById('add-relation').value = record.relation;
+            document.getElementById('add-gender').value = record.gender;
+            document.getElementById('add-age').value = record.age;
+            document.getElementById('add-height').value = record.height;
+            document.getElementById('add-weight').value = record.weight;
+            document.getElementById('add-modal').style.display = 'flex';
+        }
+
+        function submitForm() {
+            const number = document.getElementById('edit-number').value;
+            const name = document.getElementById('add-name').value;
+            const relation = document.getElementById('add-relation').value;
+            const gender = document.getElementById('add-gender').value;
+            const age = parseInt(document.getElementById('add-age').value, 10);
+            const height = parseFloat(document.getElementById('add-height').value);
+            const weight = parseFloat(document.getElementById('add-weight').value);
+
+            if (!name || !relation || !gender || isNaN(age) || isNaN(height) || isNaN(weight)) {
+                alert('请填写所有字段！');
+                return;
+            }
+
+            const newRecord = { number, name, relation, gender, age, height, weight };
+            const method = number ? 'PUT' : 'POST';
+
+            fetch('/familyfile/', {
+                method,
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(newRecord),
+            })
+            .then(response => response.json())
+            .then(result => {
+                if (result.status === 'success') {
+                    alert(`记录已成功${number ? '修改' : '添加'}！`);
+                    loadRecords();
+                    closeAddModal();
+                } else {
+                    alert(`${number ? '修改' : '添加'}失败：` + result.message);
+                }
+            })
+            .catch(error => {
+                console.error(`${number ? '修改' : '添加'}错误：`, error);
+                alert(`${number ? '修改' : '添加'}过程中发生错误，请稍后再试！`);
+            });
+        }
+        function deleteRecord(index) {
+    const record = records[index];
+    if (confirm(`确定要删除编号 ${record.number} 的记录吗？`)) {
+        fetch('/familyfile/', {
+            method: 'DELETE',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ number: record.number }), // 确保传递的 `number` 正确
+        })
+        .then(response => response.json())
+        .then(result => {
+            if (result.status === 'success') {
+                alert('记录已成功删除！');
+                loadRecords();
+            } else {
+                alert('删除失败：' + result.message);
+            }
+        })
+        .catch(error => {
+            console.error('删除错误：', error);
+            alert('删除过程中发生错误，请稍后再试！');
+        });
+    }
+}
+
+
+        function closeAddModal() {
+            document.getElementById('add-modal').style.display = 'none';
+        }
+
+        loadRecords();
+    </script>
+</body>
+</html>

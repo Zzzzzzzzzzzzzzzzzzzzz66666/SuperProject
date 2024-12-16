@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>预约信息 - 成信大智慧健康诊疗医院</title>
+    <style>
+        body {
+            font-family: 'Arial', sans-serif;
+            background-color: #f4f7fc;
+            margin: 0;
+            padding: 0;
+            color: #333;
+        }
+        .container {
+            width: 100%;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+            box-sizing: border-box;
+        }
+        h1 {
+            text-align: center;
+            color: #4CAF50;
+            font-size: 28px;
+            margin-bottom: 20px;
+            font-weight: bold;
+        }
+        .alert {
+            margin-bottom: 20px;
+            color: #555;
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 20px;
+        }
+        table th, table td {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: left;
+        }
+        table th {
+            background-color: #f2f2f2;
+        }
+        .cancel-btn {
+            display: inline-block;
+            padding: 10px 20px;
+            background-color: #FF6347;
+            color: white;
+            border-radius: 5px;
+            text-align: center;
+            margin-top: 20px;
+            cursor: pointer;
+            text-decoration: none;
+        }
+        .cancel-btn:hover {
+            background-color: #e5533f;
+        }
+        .back-btn {
+            margin-top: 20px;
+        }
+        .back-btn a {
+            color: #4CAF50;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 1px solid #4CAF50;
+            border-radius: 5px;
+            transition: background-color 0.3s ease;
+        }
+        .back-btn a:hover {
+            background-color: #4CAF50;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+<div class="container">
+    <h1>预约信息</h1>
+
+    {% if error_message %}
+        <div class="alert">
+            <p>{{ error_message }}</p>
+        </div>
+    {% elif order %}
+        <div class="alert">
+            <strong>重要提醒：</strong> 请确认您的预约信息。
+        </div>
+        <table>
+            <thead>
+                <tr>
+                    <th>项目</th>
+                    <th>信息</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>姓名</td>
+                    <td>{{ order.name }}</td>
+                </tr>
+                <tr>
+                    <td>性别</td>
+                    <td>{{ order.gender }}</td>
+                </tr>
+                <tr>
+                    <td>年龄</td>
+                    <td>{{ order.age }}</td>
+                </tr>
+                <tr>
+                    <td>电话</td>
+                    <td>{{ order.phone }}</td>
+                </tr>
+                <tr>
+                    <td>身份证号</td>
+                    <td>{{ order.id_card }}</td>
+                </tr>
+                <tr>
+                    <td>科室</td>
+                    <td>{{ order.department }}</td>
+                </tr>
+                <tr>
+                    <td>医生</td>
+                    <td>{{ order.doctor }}</td>
+                </tr>
+            </tbody>
+        </table>
+        <form method="post" id="cancel-form">
+            {% csrf_token %}
+            <input type="hidden" name="id_card" value="{{ order.id_card }}">
+            <button type="button" class="cancel-btn" onclick="cancelAppointment()">取消预约</button>
+        </form>
+    {% else %}
+        <form method="get" action="/inquire/">
+    <label for="id_card" style="font-size: 16px; color: #333; margin-bottom: 10px; display: block;">请输入身份证号：</label>
+    <input
+        type="text"
+        id="id_card"
+        name="id_card"
+        required
+        style="
+            width: 100%;
+            max-width: 400px;
+            padding: 10px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            margin-bottom: 20px;
+        ">
+    <button
+        type="submit"
+        style="
+            padding: 10px 20px;
+            font-size: 16px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        ">
+        查询预约
+    </button>
+</form>
+
+    {% endif %}
+
+    <div class="back-btn">
+        <a href="/online-register/">新增预约</a>
+    </div>
+</div>
+
+<script>
+    function cancelAppointment() {
+        const form = document.getElementById('cancel-form');
+        const formData = new FormData(form);
+
+        fetch('/inquire/', {
+            method: 'POST',
+            body: formData
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.status === 'success') {
+                alert('预约已取消');
+                window.location.href = '/inquire/';
+            } else {
+                alert(`取消失败: ${data.message}`);
+            }
+        })
+        .catch(error => {
+            console.error('Error canceling appointment:', error);
+            alert('取消失败，请稍后重试。');
+        });
+    }
+</script>
+</body>
+</html>
