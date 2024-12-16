@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+        <html lang="zh-CN">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>成信大智慧健康诊疗医院</title>
+            <style>
+                /* 基本样式 */
+                body {
+                    font-family: 'Arial', sans-serif;
+                    margin: 0;
+                    padding: 0;
+                    background-color: #f4f7fc;
+                    color: #333;
+                }
+
+                /* 顶部导航栏样式 */
+                header {
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 20px;
+                    text-align: center;
+                    font-size: 28px;
+                    font-weight: bold;
+                }
+
+                /* 右上角修改密码按钮样式 */
+                .change-password-btn {
+                    position: fixed;
+                    top: 20px;
+                    right: 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    padding: 10px 20px;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 16px;
+                    cursor: pointer;
+                    transition: background-color 0.3s ease;
+                }
+
+                .change-password-btn:hover {
+                    background-color: #45a049;
+                }
+
+                /* 内容容器 */
+                .container {
+                    margin: 30px auto;
+                    max-width: 1200px;
+                    padding: 20px;
+                    background-color: white;
+                    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+                    border-radius: 8px;
+                }
+
+                /* 介绍部分 */
+                h1 {
+                    font-size: 28px;
+                    color: #4CAF50;
+                    font-weight: bold;
+                    text-align: center;
+                    margin-bottom: 20px;
+                }
+
+                .intro-text {
+                    font-size: 16px;
+                    line-height: 1.8;
+                    margin-bottom: 30px;
+                    text-align: center;
+                }
+
+                .features ul {
+                    list-style: none;
+                    padding: 0;
+                }
+
+                .features li {
+                    padding: 5px 0;
+                    font-size: 14px;
+                }
+
+                /* 功能项横向排列 */
+                .function-bar {
+                    display: flex;
+                    justify-content: space-evenly;
+                    margin-top: 40px;
+                    font-size: 16px;
+                }
+
+                .function-bar div {
+                    text-align: center;
+                    flex: 1;
+                    margin: 0 10px;
+                }
+
+                .function-bar button {
+                    padding: 10px 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    font-size: 14px;
+                    cursor: pointer;
+                    width: 100%;
+                    transition: background-color 0.3s ease;
+                }
+
+                .function-bar button:hover {
+                    background-color: #45a049;
+                }
+
+                /* 折叠面板 */
+                .section {
+                    margin-top: 20px;
+                    background-color: #f8f8f8;
+                    padding: 10px;
+                    border-radius: 5px;
+                    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+                }
+
+                .section h3 {
+                    cursor: pointer;
+                    font-size: 14px;
+                    padding: 8px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border-radius: 5px;
+                    margin: 0;
+                    transition: background-color 0.3s ease;
+                }
+
+                .section h3:hover {
+                    background-color: #45a049;
+                }
+
+                .content {
+                    display: none;
+                    padding: 10px;
+                    background-color: #f0f0f0;
+                    margin-top: 10px;
+                    border-radius: 5px;
+                }
+
+                /* 按钮样式 */
+                button {
+                    padding: 10px 20px;
+                    background-color: #4CAF50;
+                    color: white;
+                    border: none;
+                    border-radius: 5px;
+                    cursor: pointer;
+                    font-size: 16px;
+                    transition: background-color 0.3s ease;
+                }
+
+                button:hover {
+                    background-color: #45a049;
+                }
+            </style>
+        </head>
+        <body>
+
+            <!-- 页面头部 -->
+            <header>
+                成信大智慧健康诊疗医院
+            </header>
+
+            <!-- 修改密码按钮 -->
+            <a href="{% url 'account' %}" target="_blank">
+                <button class="change-password-btn">修改密码</button>
+            </a>
+
+            <div class="container">
+
+                <!-- 首页介绍部分 -->
+                <section>
+                    <h1>欢迎来到成信大智慧健康诊疗医院</h1>
+                    <p class="intro-text">
+                        我们是一家致力于提供全方位医疗服务的现代化医疗机构。我们的宗旨是通过先进的医疗技术和温馨的人文关怀，为每一位患者带来健康和希望。
+                    </p>
+                    <div class="features">
+                        <h2>我们的特色：</h2>
+                        <ul>
+                            <li>专业团队：我们拥有一支由资深医生和护士组成的专业团队，他们在各自的领域内拥有丰富的经验和卓越的技能。</li>
+                            <li>先进设备：医院配备了最新的医疗设备和技术，确保诊断和治疗的准确性和有效性。</li>
+                            <li>个性化服务：我们重视每一位患者的独特需求，提供个性化的治疗方案和关怀服务。</li>
+                            <li>智慧医疗：利用最新的信息技术，我们实现了电子病历管理、在线预约挂号、远程医疗咨询等服务，让就医更加便捷。</li>
+                            <li>舒适环境：医院环境温馨舒适，旨在为患者提供一个放松和恢复的健康环境。</li>
+                        </ul>
+                    </div>
+
+                    <h2>我们的承诺：</h2>
+                    <ul>
+                        <li>以患者为中心，提供安全、高效、温馨的医疗服务。</li>
+                        <li>不断追求医疗技术的创新和服务质量的提升。</li>
+                        <li>与患者和家属保持开放的沟通，共同参与治疗决策。</li>
+                    </ul>
+                    <p><strong>智慧健康诊疗医院，您身边的健康守护者。我们期待为您提供服务，并与您一起迎接更健康的未来。</strong></p>
+                </section>
+
+                <!-- 功能项横向排列 -->
+                <div class="function-bar">
+                    <div>
+                        <button onclick="toggleSection('personal-info')">个人信息档案</button>
+                    </div>
+                    <div>
+                        <!-- 为家庭档案按钮添加了链接 -->
+
+                        <a href="{% url 'familyfile' %}" target="_blank">
+                            <button>家庭档案信息</button>
+                        </a>
+                    </div>
+                    <div>
+                        <button onclick="toggleSection('appointment-info')">预约挂号</button>
+                    </div>
+                </div>
+
+                <!-- 个人信息档案 -->
+                <section class="section">
+                    <div id="personal-info" class="content">
+                        <div class="section">
+                            <h3 onclick="toggleSection('personal-fill')">个人信息填写</h3>
+                            <div id="personal-fill" class="content">
+                                <!-- 跳转链接到个人信息填写页面 -->
+                                <a href="{% url 'build-personalfile' %}" target="_blank">
+                                    <button type="button">提交个人档案</button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3 onclick="toggleSection('personal-query')">个人信息查询</h3>
+                            <div id="personal-query" class="content">
+                                <!-- 跳转链接到个人信息查询页面 -->
+                                <a href="{% url 'personalfile' %}" target="_blank">
+                                    <button type="button">查询个人信息</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- 预约挂号 -->
+                <section class="section">
+                    <div id="appointment-info" class="content">
+                        <div class="section">
+                            <h3 onclick="toggleSection('appointment-fill')">线上预约挂号</h3>
+                            <div id="appointment-fill" class="content">
+                                <!-- 跳转链接到预约挂号填写页面 -->
+                                <a href="{% url 'online-register' %}" target="_blank">
+                                    <button type="button">提交预约挂号</button>
+                                </a>
+                            </div>
+                        </div>
+                        <div class="section">
+                            <h3 onclick="toggleSection('appointment-query')">预约挂号查询</h3>
+                            <div id="appointment-query" class="content">
+                                <!-- 跳转链接到预约挂号查询页面 -->
+                                <a href="{% url 'inquire' %}" target="_blank">
+                                    <button type="button">查询预约挂号</button>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- JavaScript 脚本部分 -->
+            <script>
+                // 折叠和展开的JavaScript功能
+                function toggleSection(sectionId) {
+                    const section = document.getElementById(sectionId);
+                    if (section.style.display === 'none' || section.style.display === '') {
+                        section.style.display = 'block';
+                    } else {
+                        section.style.display = 'none';
+                    }
+                }
+
+                // 页面初次加载时，折叠所有内容
+                window.onload = function() {
+                    const sections = document.querySelectorAll('.content');
+                    sections.forEach(section => {
+                        section.style.display = 'none';
+                    });
+                }
+            </script>
+        </body>
+        </html>
